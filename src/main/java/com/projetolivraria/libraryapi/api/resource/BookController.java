@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 
@@ -32,6 +33,35 @@ public class BookController {
         entity = service.save(entity);
         return modelMapper.map(entity, BookDTO.class);
     }
+
+    @GetMapping("{id}") // indica que tem que passar um parametro a mais na url
+    public BookDTO get(@PathVariable long id){
+        return service
+                .getById(id)
+                .map(book -> modelMapper.map(book, BookDTO.class)) // encontrando o livro vai mapear para o bookDTO
+                .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND)); // caso contrario lança uma exception
+    }
+
+    @DeleteMapping("{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable long id){
+        Book book = service.getById(id).orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND)); // caso contrario lança uma exception
+        service.delete(book);
+
+    }
+
+    @PutMapping("{id}")
+    public BookDTO update( @PathVariable Long id, BookDTO dto) {
+       return service.getById(id).map(book -> {
+            book.setAuthor(dto.getAuthor());
+            book.setTitle(dto.getTitle());
+            book = service.update(book);
+            return modelMapper.map(book, BookDTO.class);
+        }).orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+    }
+
+
 
     // lida com o erro de validação
     @ExceptionHandler(MethodArgumentNotValidException.class)
