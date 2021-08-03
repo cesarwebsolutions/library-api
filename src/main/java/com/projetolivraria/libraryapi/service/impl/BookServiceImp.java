@@ -4,6 +4,8 @@ import com.projetolivraria.libraryapi.api.exception.BusinessException;
 import com.projetolivraria.libraryapi.model.entity.Book;
 import com.projetolivraria.libraryapi.model.repository.BookRepository;
 import com.projetolivraria.libraryapi.service.BookService;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -49,6 +51,19 @@ public class BookServiceImp implements BookService {
 
     @Override
     public Page<Book> find(Book filter, Pageable pageRequest) {
+        Example<Book> example = Example.of(filter,
+                ExampleMatcher
+                    .matching()
+                    .withIgnoreCase()// consegue pesquisar tanto em caixa alta ou caixa baixa
+                    .withIgnoreNullValues()// ignora se tiver pesquisa nula
+                    .withStringMatcher( ExampleMatcher.StringMatcher.CONTAINING) // traz a pesquisa mesmo que o titulo nao esteje completo
+
+        );
+        return repository.findAll(example, pageRequest);
+    }
+
+    @Override
+    public Optional<Book> getBookByIsbn(String isbn) {
         return null;
     }
 }

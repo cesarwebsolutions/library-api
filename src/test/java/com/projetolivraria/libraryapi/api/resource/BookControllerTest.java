@@ -37,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith({SpringExtension.class}) // cria um minicontexto de injeção de dependencia
 @ActiveProfiles("test")
-@WebMvcTest // realiza os testes
+@WebMvcTest(controllers = BookController.class) // realiza os testes, faz o teste somente nessa pagina
 @AutoConfigureMockMvc // auto importa o objeto de teste
 public class BookControllerTest {
 
